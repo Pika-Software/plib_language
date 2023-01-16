@@ -73,9 +73,12 @@ do
                 if (line ~= nil) and string.match( line, '%s*#%s*[%w_.]*=' ) == nil then
                     local pos = string.find( line, '=' )
                     if (pos ~= nil) then
-                        local fulltext = string.sub( line, pos + 1 )
-                        if (fulltext) then
-                            Add( string.sub( line, 1, pos - 1), string.Replace( fulltext, '\n', '' ) )
+                        local fullText = string.sub( line, pos + 1 )
+                        if (fullText) then
+
+                            -- here need unicode -> string
+
+                            Add( string.sub( line, 1, pos - 1), string.Replace( fullText, '\n', '' ) )
                         end
                     end
                 end
