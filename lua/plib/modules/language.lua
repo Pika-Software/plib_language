@@ -56,40 +56,32 @@ end
 do
 
     local plib_Debug = plib.Debug
-    local SysTime = SysTime
+    local utf8_char = utf8.char
+    local tonumber = tonumber
     local ipairs = ipairs
     local string = string
     local file = file
 
-    function AddFolder( folderPath, gameDir, functions )
-        functions = functions or {}
+    local function unicodeToChar( str )
+        return utf8_char( tonumber( str, 16 ) )
+    end
+
+    function AddFolder( folderPath, gameDir )
         local files, folders = file.Find( file.Path( folderPath, '*' ), gameDir )
         for _, fl in ipairs( files ) do
-            local stopWatch = SysTime()
             local filePath = file.Path( folderPath, fl )
-            local fileClass = file.Open( filePath, 'r', gameDir )
-            while not fileClass:EndOfFile() do
-                local line = fileClass:ReadLine()
-                if (line ~= nil) and string.match( line, '%s*#%s*[%w_.]*=' ) == nil then
-                    local pos = string.find( line, '=' )
-                    if (pos ~= nil) then
-                        local fullText = string.sub( line, pos + 1 )
-                        if (fullText) then
-
-                            -- here need unicode -> string
-
-                            Add( string.sub( line, 1, pos - 1), string.Replace( fullText, '\n', '' ) )
-                        end
-                    end
+            local content = file.Read( filePath, gameDir )
+            if (content) then
+                for placeholder, str in string.gmatch( content, '([%w_%-]-)=(%C+)' ) do
+                    Add( placeholder, string.gsub( str, '\\u(%w%w%w%w)', unicodeToChar ) )
                 end
             end
 
-            fileClass:Close()
-            plib_Debug( 'Phrases from file `{0}` loaded. ({1} seconds)', filePath, string.format( '%.4f', SysTime() - stopWatch ) )
+            plib_Debug( 'Phrases from file `{0}` loaded.', filePath )
         end
 
         for _, fol in ipairs( folders ) do
-            AddFolder( file.Path( folderPath, fol ), gameDir, functions )
+            AddFolder( file.Path( folderPath, fol ), gameDir )
         end
     end
 
