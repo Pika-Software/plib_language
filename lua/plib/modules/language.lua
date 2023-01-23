@@ -10,7 +10,7 @@ if (CLIENT) then
     cvars.AddChangeCallback('gmod_language', function( _, __, new )
         hook_Run( 'LanguageChanged', current, new )
         current = new
-    end, 'PLib - Translate')
+    end, 'PLib - Language')
 
     function Get()
         return current
@@ -41,7 +41,7 @@ if (SERVER) then
         hook_Run( 'LanguageChanged', current, new )
         table_Empty( phrases )
         current = new
-    end, 'PLib - Translate')
+    end, 'PLib - Language')
 
     function Get()
         return current
